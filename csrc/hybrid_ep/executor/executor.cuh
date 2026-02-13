@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
 #pragma once
-#include <ATen/cuda/CUDAContext.h>
 #include <c10/util/Optional.h>
+#include <pybind11/pybind11.h>
 #include <torch/torch.h>
 
 #include "utils.cuh"
@@ -15,6 +15,8 @@
 #ifdef HYBRID_EP_BUILD_MULTINODE_ENABLE
 #include "buffer/internode.cuh"
 #endif
+
+namespace py = pybind11;
 
 class Executor {
 public:

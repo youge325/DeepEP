@@ -3,9 +3,14 @@
 
 #pragma once
 
+#include <pybind11/pybind11.h>
+#include <pybind11/pytypes.h>
+
 #include "utils.cuh"
 #include "config.cuh"
 #include "allocator/allocator.cuh"
+
+namespace py = pybind11;
 
 class CustomAllgather {
 public:

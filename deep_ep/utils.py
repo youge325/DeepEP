@@ -102,3 +102,9 @@ def check_nvlink_connections(group: dist.ProcessGroup,
     pynvml.nvmlShutdown()
 
 
+def get_event_from_comm_stream(group_id: int) -> EventOverlap:
+    import paddle
+    return EventOverlap(
+        event=paddle.base.core.get_event_handle_from_comm_stream(group_id)
+    )
+

@@ -11,6 +11,8 @@
 #include "allocator/allocator.cuh"
 #include "backend/hybrid_ep_backend.cuh"
 
+namespace py = pybind11;
+
 struct IntraNodeDispatchBuffers {
     APP_TOKEN_DATA_TYPE data_type;
     // Output buffers to experts

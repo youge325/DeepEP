@@ -7,12 +7,13 @@
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 #include <torch/torch.h>
-#include <ATen/cuda/CUDAContext.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
 #include <cstring>
 
 #include "utils.cuh"
+
+namespace py = pybind11;
 
 struct MemHandle {
   union MemHandleInner {

@@ -42,7 +42,7 @@ torch::Tensor Executor::allgather_routing_map(
         );
         torch_distributed.attr("all_gather_into_tensor")(global_routing_map, local_routing_map, process_group);
     } else { // At intra-node case, we will use custom allgather
-        allgather_obj.launch(local_routing_map, /*NUM_OF_SMS=*/32, at::cuda::getCurrentCUDAStream());
+        allgather_obj.launch(local_routing_map, /*NUM_OF_SMS=*/32, get_current_cuda_stream());
         global_routing_map = torch::from_blob(
             allgather_obj.get_output_buffer(), 
             {num_of_tokens_per_rank * group_size, num_of_expert},
@@ -108,7 +108,7 @@ Executor::metadata_preprocess_core(
       rdma_to_attn_map.data_ptr<bool>(), attn_to_rdma_map.data_ptr<bool>(),
       num_of_tokens_for_experts.data_ptr<int32_t>(),
       local_expert_routing_map.data_ptr<bool>(), static_cast<int>(node_rank),
-      static_cast<int>(local_rank), num_of_tokens_per_rank, at::cuda::getCurrentCUDAStream());
+    static_cast<int>(local_rank), num_of_tokens_per_rank, get_current_cuda_stream());
 
   nvtxRangePop();  // End of metadata_preprocess_core nvtx range
   return std::make_tuple(sparse_to_dense_map, rdma_to_attn_map, attn_to_rdma_map, num_of_tokens_for_experts, local_expert_routing_map);

@@ -1,10 +1,23 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved
 #include "hybrid_ep.cuh"
+#include <ATen/cuda/CUDAContext.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <functional>
+
+#ifndef TORCH_WARN
+#define TORCH_WARN(...)                          \
+  do {                                           \
+    fprintf(stderr, __VA_ARGS__);                \
+    fprintf(stderr, "\n");                       \
+  } while (0)
+#endif
+
+cudaStream_t get_current_cuda_stream() {
+  return at::cuda::getCurrentCUDAStream();
+}
 
 std::string get_comm_id(pybind11::object process_group) {
   auto torch = pybind11::module_::import("torch");
@@ -201,7 +214,7 @@ HybridEPBuffer::dispatch(HybridEpConfigInstance config,
                                 num_dispatched_tokens.value() : -1;
   args.num_of_tokens_per_rank = num_of_tokens_per_rank;
   args.enable_permute = false;
-  args.stream = at::cuda::getCurrentCUDAStream();
+  args.stream = get_current_cuda_stream();
   
   // Run the full dispatch operation
   config.forward_dispatch_api = with_probs;
@@ -259,7 +272,7 @@ HybridEPBuffer::combine(HybridEpConfigInstance config,
   args.attn_to_rdma_map = attn_to_rdma_map;
   args.num_of_tokens_per_rank = num_of_tokens_per_rank;
   args.enable_unpermute = false;
-  args.stream = at::cuda::getCurrentCUDAStream();
+  args.stream = get_current_cuda_stream();
 
   // Run the full combine operation
   config.backward_combine_api = with_probs;
@@ -317,7 +330,7 @@ HybridEPBuffer::dispatch_with_permute(HybridEpConfigInstance config,
  args.non_blocking = non_blocking;
  args.num_of_tokens_per_rank = num_of_tokens_per_rank;
  args.enable_permute = true;
- args.stream = at::cuda::getCurrentCUDAStream();
+ args.stream = get_current_cuda_stream();
  
  // Run the full dispatch operation
  config.forward_dispatch_api = with_probs;
@@ -380,7 +393,7 @@ HybridEPBuffer::combine_with_unpermute(HybridEpConfigInstance config,
   args.pad_multiple = (pad_multiple.has_value()) ? pad_multiple.value() : 0;
   args.num_of_tokens_per_rank = num_of_tokens_per_rank;
   args.enable_unpermute = true;
-  args.stream = at::cuda::getCurrentCUDAStream();
+  args.stream = get_current_cuda_stream();
 
   // Run the full combine operation
   config.backward_combine_api = with_probs;
